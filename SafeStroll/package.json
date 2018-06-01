@@ -7,19 +7,28 @@
     "test": "jest"
   },
   "dependencies": {
+    "@mapbox/polyline": "^1.0.0",
     "firebase": "^4.13.1",
+    "geo-lib": "^0.3.1",
+    "geolib": "^2.0.24",
     "lodash": "^4.17.10",
     "native-base": "^2.4.3",
     "react": "16.3.1",
+    "react-addons-update": "^15.6.2",
     "react-native": "0.55.3",
     "react-native-check-box": "^2.1.0",
+    "react-native-checkbox": "^2.0.0",
     "react-native-communications": "^2.2.1",
+    "react-native-elements": "^0.19.1",
     "react-native-geolocation-service": "^1.0.4",
+    "react-native-global-font": "^1.0.1",
     "react-native-google-places": "^2.5.0",
     "react-native-google-places-autocomplete": "^1.3.6",
     "react-native-maps": "^0.15.3",
     "react-native-maps-directions": "^1.6.0",
     "react-native-router-flux": "^4.0.0-beta.28",
+    "react-native-shake-event": "^4.0.1",
+    "react-native-sms": "^1.5.2",
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
     "redux-thunk": "^2.2.0"
@@ -33,5 +42,10 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./assets/fonts"
+    ]
   }
 }

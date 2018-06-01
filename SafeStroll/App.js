@@ -2,13 +2,22 @@ import React, { Component } from 'react';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import firebase from 'firebase';
+import RNShakeEvent from 'react-native-shake-event';
+import Communications from 'react-native-communications';
+import GlobalFont from 'react-native-global-font';
 import ReduxThunk from 'redux-thunk';
 import reducers from './src/reducers';
-// import LoginForm from './src/components/LoginForm';
 import Router from './src/Router';
+
+const ShakeEvent = require('react-native-shake-event'); //shake event stuff
 
 class App extends Component {
   componentWillMount() {
+    const fontName = 'Heiti TC';
+    GlobalFont.applyGlobal(fontName);
+    ShakeEvent.addEventListener('shake', () => {
+    Communications.phonecall('112', true);
+  });
     const config = {
       apiKey: 'AIzaSyAyliELgXeuVzjCet4TZJmELmvc9B-JqvQ',
       authDomain: 'safestroll-ccf3c.firebaseapp.com',
@@ -19,15 +28,10 @@ class App extends Component {
     };
 
 firebase.initializeApp(config);
+}
 
-//lagt till detta under för att kunna logga ut
-// firebase.auth().onAuthStateChanged((user) => {
-//     if (user) {
-//       this.setState({ loggedIn: true });
-//     } else {
-//       this.setState({ loggedIn: false });
-//     }
-//   });
+componentWillUnmount() {
+  RNShakeEvent.removeEventListener('shake');
 }
 
   render() {
