@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-//import firebase from 'firebase';
 import { Actions } from 'react-native-router-flux';
 import { View, Text, ImageBackground, StyleSheet } from 'react-native';
 import { connect } from 'react-redux';
@@ -26,8 +25,8 @@ class LoginForm extends Component {
     //   return <Spinner size="large" />;
     // }
     return (
-      <Text style={{ color: 'white' }}>
-      Do you not have an account yet? {' '}
+      <Text style={{ color: 'white', fontSize: 16 }}>
+      Do you not have an account? {' '}
         <Text style={style.signUp}>
           <Text onPress={() => Actions.signUp()}>
             Sign Up
@@ -69,13 +68,6 @@ class LoginForm extends Component {
         style={style.container}
       >
       <Card>
-      {  // <View style={{ alignItems: 'center', opacity: 0.8 }}>
-        // <Image
-        //     source={{ uri: 'https://4vector.com/i/free-vector-street-lamp-clip-art_107509_Street_Lamp_clip_art_hight.png' }}
-        //     style={{ resizeMode: 'contain', width: 200, height: 170 }}
-        // />
-        // </View>
-      }
         <CardSection style={style.cardSectionStyle}>
           <Input
             label="Email"
@@ -110,23 +102,6 @@ class LoginForm extends Component {
   }
 }
 
-// const styles = {
-//   errorTextStyle: {
-//     fontSize: 20,
-//     alignSelf: 'center',
-//     color: 'red'
-//   },
-//   textStyle: {
-//     fontSize: 18,
-//     alignSelf: 'center',
-//     color: 'black',
-//     paddingTop: 10
-//   },
-//   cardSectionStyle: {
-//     width: 200
-//   }
-// };
-
 const style = StyleSheet.create({
   container: {
     flex: 1,
@@ -148,7 +123,7 @@ const style = StyleSheet.create({
     paddingTop: 10
   },
   cardSectionStyle: {
-    width: 300,
+    width: 320,
     marginTop: 10,
     marginBottom: 2
   },

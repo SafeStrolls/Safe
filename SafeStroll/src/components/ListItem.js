@@ -11,14 +11,15 @@ class ListItem extends Component {
   }
 
   render() {
-    const { name } = this.props.contact;
+    const { userName } = this.props.contact;
 
     return (
       <TouchableWithoutFeedback onPress={this.onRowPress.bind(this)}>
         <View>
           <CardSection>
+          <Icon name="ios-person" />
             <Text style={styles.titleStyle}>
-              {name}
+              {userName}
             </Text>
             <Right>
             <Icon name="arrow-forward" />

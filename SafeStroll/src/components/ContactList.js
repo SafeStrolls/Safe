@@ -1,16 +1,30 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { ListView } from 'react-native';
-//import firebase from 'firebase';
+import { ListView, Text, View } from 'react-native';
 import { Container, Item, Input, Icon } from 'native-base';
 import { contactsFetch } from '../actions';
 import { Card, CardSection } from './common';
 import ListItem from './ListItem';
-//import SearchBar from './SearchBar';
 
+const ds = new ListView.DataSource({
+  rowHasChanged: (r1, r2) => r1 !== r2
+});
 
 class ContactList extends Component {
+
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      searchedContacts: []
+    };
+  }
+
+  state = {
+    pressedSearch: false
+  } ;
+
   componentWillMount() {
     this.props.contactsFetch();
 
@@ -25,83 +39,33 @@ class ContactList extends Component {
     this.createDataSource(nextProps);
   }
 
-  formatData(data) {
-    // We're sorting by alphabetically so we need the alphabet
-    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
-
-    // Need somewhere to store our data
-    const dataBlob = {};
-    const sectionIds = [];
-    const rowIds = [];
-
-    // Each section is going to represent a letter in the alphabet so we loop over the alphabet
-    for (let sectionId = 0; sectionId < alphabet.length; sectionId++) {
-      // Get the character we're currently looking for
-      const currentChar = alphabet[sectionId];
-
-      // Get users whose first name starts with the current letter
-      const users = data.filter((contact) => contact.name.toUpperCase().indexOf(currentChar) === 0);
-
-      // If there are any users who have a first name starting with the current letter then we'll
-      // add a new section otherwise we just skip over it
-      if (users.length > 0) {
-        // Add a section id to our array so the listview knows that we've got a new section
-        sectionIds.push(sectionId);
-
-        // Store any data we would want to display in the section header.
-        // In our case we want to show
-        // the current character
-        dataBlob[sectionId] = { character: currentChar };
-
-        // Setup a new array that we can store the row ids for this section
-        rowIds.push([]);
-
-        // Loop over the valid users for this section
-        for (let i = 0; i < users.length; i++) {
-          // Create a unique row id for the data blob that the listview can use for reference
-          const rowId = `${sectionId}:${i}`;
-
-          // Push the row id to the row ids array. This is what listview will reference to pull
-          // data from our data blob
-          rowIds[rowIds.length - 1].push(rowId);
-
-          // Store the data we care about for this row
-          dataBlob[rowId] = users[i];
-        }
-      }
-    }
-
-    return { dataBlob, sectionIds, rowIds };
-  }
   createDataSource({ contacts }) {
     const ds = new ListView.DataSource({
       rowHasChanged: (r1, r2) => r1 !== r2
     });
 
     this.dataSource = ds.cloneWithRows(contacts);
+    console.log(this.dataSource);
   }
 
-/////////////
+  listenForItems(itemsRef) {
+    itemsRef.on('value', (snap) => {
+      const items = [];
+      snap.forEach((child) => {
+        items.push({
+          username: child.val().userName,
+          phone: child.val().phone,
+        });
+      });
 
-listenForItems(itemsRef) {
-  itemsRef.on('value', (snap) => {
-    const items = [];
-    snap.forEach((child) => {
-      items.push({
-        name: child.val().name,
-        phone: child.val().phonecall,
+      this.setState({
+        dataSource: this.state.dataSource.cloneWithRows(items)
       });
     });
-
-    this.setState({
-      dataSource: this.state.dataSource.cloneWithRows(items)
-    });
-});
-}
+  }
 
   firstSearch() {
     this.searchDirectory(this.itemsRef);
-    console.log('inne i firstSearch');
   }
 
   searchDirectory(itemsRef) {
@@ -110,12 +74,12 @@ listenForItems(itemsRef) {
     if (searchText === '') {
       this.listenForItems(itemsRef);
     } else {
-itemsRef.orderByChild('name').on('value', (snap) => {   //denna rad funkar ej
+      itemsRef.orderByChild('name').on('value', (snap) => {
         console.log(snap.val());
         const items = [];
         snap.forEach((child) => {
           items.push({
-            name: child.val().name,
+            username: child.val().userName,
             phone: child.val().phone,
           });
         });
@@ -128,69 +92,87 @@ itemsRef.orderByChild('name').on('value', (snap) => {   //denna rad funkar ej
     }
   }
 
-  ///////
+  searchedContacts = (searchedText) => {
+    this.state.pressedSearch = true;
+    const searchedContacts = this.props.contacts.filter(
+      (contact) => {
+        return contact.userName.indexOf(searchedText) > -1;
+      });
+      this.setState({ searchedContacts });
+    };
 
-  renderRow(contact) {
-    return <ListItem contact={contact} />;
-  }
+    renderRow(contact) {
+      return <ListItem contact={contact} />;
+    }
 
-  render() {
-    return (
-      <Card>
-        <CardSection style={{ height: 70, backgroundColor: 'transparent' }}>
-          <Container searchBar rounded>
-          <Item style={{ backgroundColor: '#d1d1d1', borderRadius: 15 }}>
-          <Icon name="ios-search" style={{ paddingLeft: 5 }} />
-          <Input
-            returnKeyType='search'
-            onChangeText={(text) => this.setState({ searchText: text })}
-            onSubmitEditing={() => this.firstSearch()}
-            placeholder="Search"
-          />
-          </Item>
-          {  // <Button transparent>
-            //   <Text>Search</Text>
-            // </Button>
-          }
-          </Container>
-        </CardSection>
+    returnSearchView() {
+      return (
+        <Card>
+          <CardSection style={{ height: 70, backgroundColor: 'transparent' }}>
+            <Container searchBar rounded>
+              <Item style={{ backgroundColor: '#d1d1d1', borderRadius: 10 }}>
+                <Icon name="ios-search" style={{ paddingLeft: 5 }} />
+                <Input
+                returnKeyType='search'
+                onChangeText={this.searchedContacts.bind(this)}
+                placeholder="Search"
+                value={this.state.value}
+                />
+              </Item>
+            </Container>
+          </CardSection>
         <CardSection style={{ height: 450 }}>
-            <ListView
-                  removeClippedSubviews={false}
-                  enableEmptySections
-                  dataSource={this.dataSource}
-                  renderRow={this.renderRow}
-            />
+          <ListView
+            removeClippedSubviews={false}
+            enableEmptySections
+            dataSource={ds.cloneWithRows(this.state.searchedContacts)}
+            renderRow={this.renderRow}
+          />
         </CardSection>
 
-      </Card>
-    );
+        </Card>
+      );
+    }
+
+    render() {
+      if (!this.state.pressedSearch) {
+        return (
+          <Card>
+            <CardSection style={{ height: 70, backgroundColor: 'transparent' }}>
+              <Container searchBar rounded>
+                <Item style={{ backgroundColor: '#d1d1d1', borderRadius: 10 }}>
+                  <Icon name="ios-search" style={{ paddingLeft: 5 }} />
+                  <Input
+                    style={{ fontFamily: 'Heiti TC' }}
+                    returnKeyType='search'
+                    onChangeText={this.searchedContacts.bind(this)}
+                    placeholder="Search"
+                    value={this.state.value}
+                  />
+                </Item>
+              </Container>
+            </CardSection>
+            <CardSection style={{ height: 450 }}>
+              <ListView
+                removeClippedSubviews={false}
+                enableEmptySections
+                dataSource={this.dataSource}
+                renderRow={this.renderRow}
+              />
+            </CardSection>
+          </Card>
+        );
+      }
+      return this.returnSearchView();
+    }
   }
-}
 
-// const styles = StyleSheet.create({
-//   container: {
-//     alignItems: 'center',
-//     backgroundColor: '#C1C1C1',
-//     borderRadius: 15
-//   },
-//   input: {
-//     height: 30,
-//     flex: 1,
-//     paddingHorizontal: 8,
-//     fontSize: 15,
-//     backgroundColor: '#FFFFFF',
-//     borderRadius: 2,
-//   }
-//
-// });
+  const mapStateToProps = state => {
+    const contacts = _.map(state.contacts, (val, uid) => {
+      return { ...val, uid };
+    });
 
-const mapStateToProps = state => {
-  const contacts = _.map(state.contacts, (val, uid) => {
-    return { ...val, uid };
-  });
+    return { contacts };
+  };
 
-  return { contacts };
-};
-
-export default connect(mapStateToProps, { contactsFetch })(ContactList);
+  export default connect(mapStateToProps, { contactsFetch })(ContactList);

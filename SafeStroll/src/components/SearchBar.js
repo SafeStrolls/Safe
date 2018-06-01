@@ -44,10 +44,6 @@ itemsRef.orderByChild('searchable').startAt(searchText).endAt(searchText).on('va
         placeholder="Search"
       />
       </Item>
-      {  // <Button transparent>
-        //   <Text>Search</Text>
-        // </Button>
-      }
       </Container>
     );
  }

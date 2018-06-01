@@ -1,38 +1,46 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
-import Checkbox from 'react-native-check-box';
-import { Right } from 'native-base';
-//import { Actions } from 'react-native-router-flux';
+import { Right, Icon } from 'native-base';
+import { connect } from 'react-redux';
+import { setChosenContatcs } from '../actions';
 import { CardSection } from './common';
+import CheckBox from 'react-native-checkbox';
+
 
 class ListItemPosition extends Component {
-  // onRowPress() {
-  //   Actions.contactInfo({ contact: this.props.contact });
-  // }
-  onClick(name) {
-    name.checked = !name.checked;
+
+  onClick(userName) {
+    const { phone } = this.props.contact;
+    userName.checked = !userName.checked;
+
+
+    if (!userName.checked) {
+      this.props.setChosenContatcs({ userName, phone });
+    }
   }
 
   render() {
-    const { name } = this.props.contact;
+    const { userName } = this.props.contact;
 
     return (
-      //<TouchableWithoutFeedback onPress={this.onRowPress.bind(this)}>
         <View>
           <CardSection>
+          <Icon name="ios-person" />
             <Text style={styles.titleStyle}>
-              {name}
+              {userName}
             </Text>
             <Right>
-            <Checkbox
-              style={{ flex: 1, padding: 10 }}
-              onClick={() => this.onClick(name)}
-              isChecked={name.checked}
+            <CheckBox
+                  checkedIcon='dot-circle-o'
+                  uncheckedIcon='circle-o'
+                  style={{ flex: 1, padding: 10 }}
+                  onClick={() => this.onClick(userName)}
+                  isChecked={userName.checked}
+                  label=''
             />
             </Right>
           </CardSection>
         </View>
-      //</TouchableWithoutFeedback>
     );
   }
 }
@@ -44,4 +52,9 @@ const styles = {
   }
 };
 
-export default ListItemPosition;
+const mapStateToProps = ({ users }) => {
+  const { userName, phone } = users;
+  return { userName, phone };
+};
+
+export default connect(mapStateToProps, { setChosenContatcs })(ListItemPosition);

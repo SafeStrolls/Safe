@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { View, Text } from 'react-native';
-//import firebase from 'firebase';
+import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
 import {
   emailChanged,
@@ -8,21 +8,13 @@ import {
   signUpUser
 } from '../actions';
 import { Card, CardSection, Button, Input } from './common';
-//import EmployeeForm from './EmployeeForm';
 
 class SignUp extends Component {
+
   onEmailChange(text) {
     this.props.emailChanged(text);
   }
-  // onNameChange(text) {
-  //   this.props.nameChanged(text);
-  // }
-  // onLastNameChange(text) {
-  //   this.props.lastNameChanged(text);
-  // }
-  // onPhoneChange(text) {
-  //   this.props.phoneChanged(text);
-  // }
+
   onPasswordChange(text) {
     this.props.passwordChanged(text);
   }
@@ -31,11 +23,11 @@ class SignUp extends Component {
     const { email, password } = this.props;
 
     this.props.signUpUser({ email, password });
+    Actions.GetUserName();
   }
 
   renderError() {
     if (this.props.error) {
-      console.log('there is an error');
       return (
         <View style={{ backgroundColor: 'transparent' }}>
           <Text style={styles.errorTextStyle}>
@@ -46,9 +38,11 @@ class SignUp extends Component {
     }
   }
 
+
   render() {
     return (
       <Card>
+
         <CardSection>
           <Input
             label="Email"
@@ -72,7 +66,7 @@ class SignUp extends Component {
 
         <CardSection style={{ backgroundColor: 'transparent' }}>
           <Button onPress={this.onSignButtonPress.bind(this)}>
-            Create
+            Continue
           </Button>
         </CardSection>
       </Card>

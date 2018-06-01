@@ -1,7 +1,8 @@
 import firebase from 'firebase';
 import { Actions } from 'react-native-router-flux';
 import { CONTACT_UPDATE, CONTACT_CREATE,
-   CONTACTS_FETCH_SUCCESS, CONTACT_SAVE_SUCCESS, USER_CREATE } from './types';
+   CONTACTS_FETCH_SUCCESS, CONTACT_SAVE_SUCCESS,
+   USER_CREATE, CHOSEN_FETCH_SUCCESS } from './types';
 
 export const contactUpdate = ({ prop, value }) => {
   return {
@@ -10,12 +11,13 @@ export const contactUpdate = ({ prop, value }) => {
   };
 };
 
-export const contactCreate = ({ name, phone }) => {
+export const contactCreate = ({ userName, phone }) => {
+  console.log(userName);
   const { currentUser } = firebase.auth();
 
   return (dispatch) => {
     firebase.database().ref(`/users/${currentUser.uid}/contacts`)
-      .push({ name, phone })
+      .push({ userName, phone })
       .then(() => {
         dispatch({ type: CONTACT_CREATE });
        Actions.pop();
@@ -31,7 +33,6 @@ export const signUp = ({ name, lastName, phoneNumber, email, password }) => {
     .push({ name, lastName, phoneNumber, email, password })
     .then(() => {
       dispatch({ type: USER_CREATE });
-      //Actions.employeeList({ type: 'reset' });
       Actions.pop();
     });
   };
@@ -73,4 +74,26 @@ export const contactDelete = ({ uid }) => {
   };
 };
 
-//behöver vi skapa en funktion för contactCreate??
+export const chosenContactsFetch = () => {
+  const { currentUser } = firebase.auth();
+
+  return (dispatch) => {
+    firebase.database().ref(`/users/${currentUser.uid}/ChosenContacts`)
+      .on('value', snapshot => {
+        dispatch({ type: CHOSEN_FETCH_SUCCESS, payload: snapshot.val() });
+        console.log(snapshot.val());
+        console.log('chosenContactFetch i actions');
+      });
+  };
+};
+
+export const chosenContactDelete = () => {
+  const { currentUser } = firebase.auth();
+
+  return () => {
+    firebase.database().ref(`/users/${currentUser.uid}/ChosenContacts`)
+    .remove()
+    .then(() => {
+    });
+  };
+};

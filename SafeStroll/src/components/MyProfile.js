@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import firebase from 'firebase';
-import { Text } from 'react-native';
+import { Text, Alert, Image } from 'react-native';
+import { Actions } from 'react-native-router-flux';
 import { connect } from 'react-redux';
-import { Card, CardSection, Button, Spinner, Confirm } from './common';
-import { logoutUser, deleteUser } from '../actions';
+import { Icon, Right } from 'native-base';
+import { Card, CardSection, Button, Spinner } from './common';
+import { logoutUser, deleteUser, removeUser } from '../actions';
 
 class MyProfile extends Component {
     state = { showModal: false }
-    //const user = firebase.auth().currentUser;
 
     onLogoutButtonPress() {
       const { email, password } = this.props;
@@ -15,41 +16,39 @@ class MyProfile extends Component {
       this.props.logoutUser({ email, password });
     }
 
-    onDeleteAccountButtonPress() {
-      // this.setState({ showModal: !this.state.showModal });
-      //
-      // const { email, password } = this.props;
-      //
-      // this.props.deleteUser({ email, password });
-    }
-
-    onDecline() {
-      this.setState({ showModal: false });
-    }
-
     onAccept() {
-      this.setState({ showModal: !this.state.showModal });
-
       const { email, password } = this.props;
 
       this.props.deleteUser({ email, password });
+      this.props.removeUser();
     }
 
     logoutButton() {
       if (this.props.loading) {
         return <Spinner size="large" />;
       }
-
       return (
         <Button onPress={this.onLogoutButtonPress.bind(this)}>
-          Log out
+          Log Out
         </Button>
       );
     }
 
     deleteAccountButton() {
+      if (this.props.loading) {
+        return <Spinner size="large" />;
+      }
       return (
-        <Button onPress={() => this.setState({ showModal: !this.state.showModal })}>
+        <Button
+        onPress={() => Alert.alert(
+          'Delete Account',
+          'Are you sure you want to delete your account?',
+        [
+          { text: 'Yes', onPress: () => this.onAccept() },
+          { text: 'Cancel' },
+        ],
+        { cancelable: false }
+      )}>
         Delete Account
         </Button>
       );
@@ -59,10 +58,26 @@ class MyProfile extends Component {
   render() {
     const user = firebase.auth().currentUser;
     const email = user.email;
-    // const password = user.password;
+    const userName = user.userName;
 
         return (
           <Card>
+            <CardSection style={{ backgroundColor: 'transparent', height: 180, alignSelf: 'center' }}>
+              <Image
+              source={require('./common/img/profilePic.png')}
+              style={{ borderRadius: 90, height: 200, width: 200, marginTop: -20, opacity: 0.5 }}
+              />
+            </CardSection>
+
+            <CardSection style={{ height: 50 }}>
+              <Text style={styles.titleStyle}>
+                Username:
+              </Text>
+              <Text style={styles.emailStyle}>
+                {userName}
+              </Text>
+            </CardSection>
+
             <CardSection style={{ height: 50 }}>
               <Text style={styles.titleStyle}>
                 Email:
@@ -73,8 +88,12 @@ class MyProfile extends Component {
             </CardSection>
             <CardSection style={{ height: 50 }}>
               <Text style={styles.titleStyle}>
-                Password: ******
+                Password: *****
               </Text>
+              <Right><Icon
+                      name="md-create" onPress={() => Actions.profileEdit()}
+              />
+            </Right>
             </CardSection>
 
             <CardSection style={{ backgroundColor: 'transparent' }}>
@@ -85,14 +104,6 @@ class MyProfile extends Component {
               {this.deleteAccountButton()}
             </CardSection>
 
-            <Confirm
-              visible={this.state.showModal}
-              onAccept={this.onAccept.bind(this)} //lägg till NÅTSOMREFTILLKONTAKTENIFRÅGA?
-              onDecline={this.onDecline.bind(this)}
-            >
-              Are you sure you want to delete your account?
-            </Confirm>
-
           </Card>
         );
   }
@@ -101,18 +112,18 @@ class MyProfile extends Component {
 const styles = {
   titleStyle: {
     fontSize: 18,
-    padding: 10
+    paddingTop: 7,
+    paddingLeft: 10
   },
   emailStyle: {
     fontSize: 18,
-    padding: 10,
-    color: '#007aff'
+    paddingTop: 7,
+    paddingLeft: 10,
+    color: 'black'
   }
 };
 
 const mapStateToProps = () => {
-  // console.log('auth:');
-  // console.log({ auth });
   const { email, password, error } = '';
   const { loading } = false;
 
@@ -120,6 +131,4 @@ const mapStateToProps = () => {
   };
 
 export default connect(mapStateToProps,
-  { logoutUser, deleteUser })(MyProfile);
-
-//export default MyProfile;
+  { logoutUser, deleteUser, removeUser })(MyProfile);

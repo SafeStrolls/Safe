@@ -1,7 +1,4 @@
-import firebase from 'firebase';
-//import update from 'react-addons-update';
-//import Geolocation from 'react-native-geolocation-service';
-//import { Dimensions } from 'react-native';
+import firebase, { getReason } from 'firebase';
 import { Actions } from 'react-native-router-flux';
 import { EMAIL_CHANGED,
          PASSWORD_CHANGED,
@@ -16,8 +13,35 @@ import { EMAIL_CHANGED,
          SIGN_UP_FAIL,
          SIGN_UP_SUCCESS,
          PROFILE_UPDATE,
-         PROFILE_SAVE_SUCCESS
+         PROFILE_SAVE_SUCCESS,
+         USER_SAVE_SUCCESS,
+         USER_NAME_UPDATE,
+         SET_USER_ID,
+         USER_FETCH_SUCCESS,
+         PHONE_UPDATE
         } from './types';
+
+export const phoneChanged = (text) => {
+  return {
+    type: PHONE_UPDATE,
+    payload: text
+  };
+};
+
+export const setUsersInfo = ({ userName, phone }) => {
+  const { currentUser } = firebase.auth();
+
+  return (dispatch) => {
+    firebase.database().ref(`/users/${currentUser.uid}`)
+    .set({ userName, phone })
+    .then(() => {
+      dispatch({ type: USER_SAVE_SUCCESS });
+      console.log(userName);
+
+      Actions.auth();
+    });
+  };
+};
 
 export const emailChanged = (text) => {
   return {
@@ -40,18 +64,13 @@ export const profileUpdate = ({ prop, value }) => {
 };
 
 export const loginUser = ({ email, password }) => {
+  //const { currentUser } = firebase.auth();
   return (dispatch) => {
     dispatch({ type: LOGIN_USER });
 
   firebase.auth().signInWithEmailAndPassword(email, password)
     .then(user => loginUserSuccess(dispatch, user))
-    .catch((error) => {
-      console.log(error);
-
-      firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then(user => loginUserSuccess(dispatch, user))
-        .catch(() => loginUserFail(dispatch));
-    });
+    .catch(() => loginUserFail(dispatch));
   };
 };
 
@@ -61,9 +80,6 @@ export const logoutUser = () => {
 
   firebase.auth().signOut()
     .then(user => logoutSuccess(dispatch, user)
-    // .catch((error) => {
-    //   console.log(error);
-    // })
   );
   };
 };
@@ -80,8 +96,6 @@ export const deleteUser = () => {
 };
 
 export const signUpUser = ({ email, password }) => {
-  // firebase.auth().languageCode = 'it';
-  // const appVerifier = window.recaptchaVerifier;
 
   return (dispatch) => {
     dispatch({ type: SIGN_UP_USER });
@@ -97,7 +111,6 @@ export const profileSave = ({ email, password }) => {
   const { currentUser } = firebase.auth();
 
   return (dispatch) => {
-    //const newEmail = currentUser.updateEmail(email)
     const newPassword = currentUser.updatePassword(password)
       .then(() => {
         loginUser({ email, newPassword });
@@ -107,12 +120,12 @@ export const profileSave = ({ email, password }) => {
       .catch((error) => {
         console.log(error);
       });
-      //Actions.myProfile();
     };
   };
 
 const loginUserFail = (dispatch) => {
   dispatch({ type: LOGIN_USER_FAIL });
+  getReason();
 };
 
 const signUpFail = (dispatch) => {
@@ -126,7 +139,7 @@ const loginUserSuccess = (dispatch, user) => {
     payload: user
   });
 
-  Actions.main(); // byter till contactList scene
+  Actions.main();
 };
 
 const logoutSuccess = (dispatch, user) => {
@@ -150,5 +163,48 @@ const signUpSuccess = (dispatch, user) => {
     type: SIGN_UP_SUCCESS,
     payload: user
   });
-  Actions.auth();
+};
+
+export const setIDUserName = ({ userName, phone }) => {
+  const { currentUser } = firebase.auth();
+  const useruid = currentUser.uid;
+
+  return (dispatch) => {
+    firebase.database().ref('/usernames')
+    .push({ useruid, userName, phone })
+    .then(() => {
+      dispatch({ type: SET_USER_ID });
+    });
+  };
+};
+
+export const usersFetch = () => {
+  //const { currentUser } = firebase.auth();
+
+  return (dispatch) => {
+    firebase.database().ref('/usernames')
+      .on('value', snapshot => {
+        dispatch({ type: USER_FETCH_SUCCESS, payload: snapshot.val() });
+        console.log(snapshot.val());
+      });
+  };
+};
+
+
+export const userNameChanged = (text) => {
+  return {
+    type: USER_NAME_UPDATE,
+    payload: text
+  };
+};
+
+export const removeUser = () => {
+  const { currentUser } = firebase.auth();
+
+  return () => {
+    firebase.database().ref(`/users/${currentUser.uid}`)
+    .remove()
+    .then(() => {
+    });
+  };
 };

@@ -83,22 +83,7 @@ class Start extends Component {
               showsUserLocation
               followUserLocation
               onRegionChange={this.onRegionChange.bind(this)}
-              onPress={this.onMapPress.bind(this)}
             >
-              {// <MapView.Marker
-              //   coordinate={{
-              //     latitude: (this.state.lastLat + 0.00050) || -36.82339,
-              //     longitude: (this.state.lastLong + 0.00050) || -73.03569,
-              //   }}
-              // >
-              //   {// <View>
-              //   //   <Text style={{ color: '#000' }} >
-              //   //     { this.state.lastLong } / { this.state.lastLat }
-              //   //   </Text>
-              //   // </View>
-              // }
-              // </MapView.Marker>
-            }
             </MapView>
           </View>
           </CardSection>
@@ -108,6 +93,7 @@ class Start extends Component {
           </CardSection>
           <CardSection style={{ height: 150 }}>
               <ListView
+                removeClippedSubviews={false}
                 enableEmptySections
                 dataSource={this.dataSource}
                 renderRow={this.renderRow}
@@ -116,7 +102,7 @@ class Start extends Component {
 
           <CardSection style={{ backgroundColor: 'transparent' }}>
             <Button onPress={() => Actions.direction()}>
-              Go home
+              Go Home
             </Button>
           </CardSection>
       </Card>
@@ -126,11 +112,10 @@ class Start extends Component {
 
 const styles = StyleSheet.create({
   titleStyle: {
-    fontSize: 18,
+    fontSize: 17,
     paddingLeft: 15
   },
   map: {
-    //...StyleSheet.absoluteFillObject,
     height: '100%',
     width: '100%'
   }

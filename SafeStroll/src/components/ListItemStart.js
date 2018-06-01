@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Text, View } from 'react-native';
+import { Icon } from 'native-base';
 import { Actions } from 'react-native-router-flux';
 import { CardSection } from './common';
 
@@ -9,13 +10,14 @@ class ListItemStart extends Component {
   }
 
   render() {
-    const { name } = this.props.contact;
+    const { userName } = this.props.contact;
 
     return (
         <View>
           <CardSection>
+            <Icon name="ios-person" />
             <Text style={styles.titleStyle}>
-              {name}
+              {userName}
             </Text>
           </CardSection>
         </View>

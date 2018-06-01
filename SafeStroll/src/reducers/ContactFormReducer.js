@@ -5,9 +5,8 @@ import {
 } from '../actions/types';
 
 const INITIAL_STATE = {
-  name: '',
   phone: '',
-  shift: ''
+  userName: ''
 };
 
 export default (state = INITIAL_STATE, action) => {

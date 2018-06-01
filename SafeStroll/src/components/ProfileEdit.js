@@ -1,23 +1,24 @@
-//import _ from 'lodash';
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
+import { Alert } from 'react-native';
 import { emailChanged, passwordChanged, profileSave } from '../actions';
 import { Card, CardSection, Button, Input } from './common';
 
 class ProfileEdit extends Component {
 
-  // componentWillMount() {
-  //   _.each(this.props.user, (prop, value) => {
-  //     this.props.profileUpdate({ prop, value });
-  //   });
-  // }
-
   onButtonPress() {
-    const { email, password } = this.props; //removed shift after phone
+    const { email, password } = this.props;
 
     this.props.profileSave({ email, password });
-    //, uid: this.props.user.uid
+    Alert.alert(
+    'Password Changed',
+    'Your password was successfully changed!',
+  [
+    { text: 'Ok' }
+  ],
+  { cancelable: false });
   }
+
   onEmailChange(text) {
     this.props.emailChanged(text);
   }
@@ -39,21 +40,12 @@ class ProfileEdit extends Component {
           />
         </CardSection>
 
-        <CardSection>
+        <CardSection style={{ backgroundColor: 'transparent' }}>
         <Button onPress={this.onButtonPress.bind(this)}>
           Save Changes
         </Button>
         </CardSection>
       </Card>
-        // <CardSection>
-        //   <Input
-        //     label="Email"
-        //     placeholder="email@gmail.com"
-        //     onChangeText={this.onEmailChange.bind(this)}
-        //     value={this.props.email}
-        //   />
-        // </CardSection>
-
     );
   }
 }

@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { contactUpdate, contactCreate } from '../actions';
-import { Card, CardSection, Button } from './common';
-import ContactForm from './ContactForm';
-
+import { Card, CardSection, Button, Input } from './common';
 
 class ContactCreate extends Component {
   onButtonPress() {
@@ -13,18 +11,36 @@ class ContactCreate extends Component {
   }
 
   render() {
-    return (
-      <Card>
-        <ContactForm {...this.props} />
+      return (
+        <Card>
         <CardSection>
-          <Button onPress={this.onButtonPress.bind(this)}>
-            Create
-          </Button>
+          <Input
+            label="Name:"
+            placeholder="Jane"
+            editable={false}
+            value={this.props.name}
+            onChangeText={value => this.props.contactUpdate({ prop: 'name', value })}
+          />
         </CardSection>
-      </Card>
-    );
+
+        <CardSection>
+          <Input
+            label="Phone:"
+            placeholder="123-123-123"
+            value={this.props.phone}
+            onChangeText={value => this.props.contactUpdate({ prop: 'phone', value })}
+          />
+        </CardSection>
+
+          <CardSection style={{ backgroundColor: 'transparent' }}>
+            <Button onPress={this.onButtonPress.bind(this)}>
+              Create
+            </Button>
+          </CardSection>
+        </Card>
+      );
+    }
   }
-}
 
 const mapStateToProps = (state) => {
   const { name, phone } = state.contactForm;

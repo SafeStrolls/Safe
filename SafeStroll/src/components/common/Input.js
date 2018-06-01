@@ -22,15 +22,17 @@ const Input = ({ label, value, onChangeText, placeholder, secureTextEntry }) => 
 const styles = {
   inputStyle: {
     color: '#000',
-    paddingRight: 5,
-    paddingLeft: 5,
-    fontSize: 18,
+    fontFamily: 'Heiti TC',
+    paddingRight: 2,
+    paddingLeft: 0,
+    paddingTop: 0,
+    fontSize: 16,
     lineHeight: 23,
     flex: 2       //proportion of siblings
   },
   labelStyle: {
-    fontSize: 18,
-    paddingLeft: 20,
+    fontSize: 16,
+    paddingLeft: 5,
     flex: 1
   },
   containerStyle: {
